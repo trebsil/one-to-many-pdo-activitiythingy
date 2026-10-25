@@ -1,25 +1,26 @@
 <?php
 
-require_once 'dbConfig.php';
+require_once __DIR__ . '/dbConfig.php';
 
 function insertNewGameDev($pdo, $firstName, $lastName, $email) {
-    $sql = "INSERT INTO developers (firstName, lastName, email)) VALUES (?,?,?)";
+    $sql = "INSERT INTO developers (firstName, lastName, email) VALUES (?,?,?)";
     $stmt = $pdo->prepare($sql);
     return $stmt->execute([$firstName, $lastName, $email]);
 }
 
 function seeAllGameDevRecords($pdo) {
     $sql = "SELECT * FROM developers";
-    $stmt = $pdo-> prepare($sql);
+    $stmt = $pdo->prepare($sql);
     if ($stmt->execute()) {
         return $stmt->fetchAll();
     }
+    return [];
 }
 
 function getGameDevByID($pdo, $developer_id) {
-    $sql = "SELECT * FROM applications WHERE develoepr_id = ?";
+    $sql = "SELECT * FROM developers WHERE developer_id = ?";
     $stmt = $pdo->prepare($sql);
-    if ($stmt-> execute([$developer_id])) {
+    if ($stmt->execute([$developer_id])) {
         return $stmt->fetch();
     }
 }
@@ -31,41 +32,39 @@ function updateGameDevByID($pdo, $firstName, $lastName, $email, $developer_id) {
                     email = ?
                 WHERE developer_id = ?";
     $stmt = $pdo->prepare($sql);
-    return ($stmt->execute([$firstName, $lastName, $email, $developer_id]));
+    return $stmt->execute([$firstName, $lastName, $email, $developer_id]);
 }
 
 function deleteAGameDev($pdo, $developer_id) {
     $sql = "DELETE FROM developers WHERE developer_id = ?";
     $stmt = $pdo->prepare($sql);
-    return ($stmt->execute([$developer_id]));
+    return $stmt->execute([$developer_id]);
 }
 
 function getGamesByDev($pdo, $developer_id) {
-    $sql = "SELECT g.game_id AS game_id, g.title AS title, g.genre AS genre, CONCAT (d.firstName,' ', d.lastName) AS project_owner
+    $sql = "SELECT g.game_id AS game_id, g.title AS title, g.genre AS genre,
+                   CONCAT(d.firstName, ' ', d.lastName) AS project_owner
             FROM games AS g
             JOIN developers AS d ON g.developer_id = d.developer_id
-            WHERE g.developer_id = ?
-            GROUP BY g.title";
-            ;
+            WHERE g.developer_id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$developer_id]);
     return $stmt->fetchAll();
 }
 
-function insertGame ($pdo, $title, $genre, $developer_id) {
-    $sql = "INSERT INTO games (title, genre, developer_id} VALUES (?,?,?)";
+function insertGame($pdo, $title, $genre, $developer_id) {
+    $sql = "INSERT INTO games (title, genre, developer_id) VALUES (?,?,?)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$title, $genre, $developer_id]);
-    return true;
+    return $stmt->execute([$title, $genre, $developer_id]);
 }
 
 function getGamesById($pdo, $game_id) {
-    $sql = "SELECT g.game_id AS game_id, g.title AS title, g.genre AS genre, CONCAT (d.firstName,' ', d.lastName) AS project_owner
+    $sql = "SELECT g.game_id AS game_id, g.title AS title, g.genre AS genre,
+                   g.developer_id AS developer_id,
+                   CONCAT(d.firstName, ' ', d.lastName) AS project_owner
             FROM games AS g
             JOIN developers AS d ON g.developer_id = d.developer_id
-            WHERE g.developer_id = ?
-            GROUP BY g.title";
-            ;
+            WHERE g.game_id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$game_id]);
     return $stmt->fetch();
@@ -77,11 +76,11 @@ function updateGameByID($pdo, $title, $genre, $game_id) {
                     genre = ?
                 WHERE game_id = ?";
     $stmt = $pdo->prepare($sql);
-    return ($stmt->execute([$title, $genre, $game_id]));
+    return $stmt->execute([$title, $genre, $game_id]);
 }
 
 function deleteAGame($pdo, $game_id) {
     $sql = "DELETE FROM games WHERE game_id = ?";
     $stmt = $pdo->prepare($sql);
-    return ($stmt->execute([$game_id]));
+    return $stmt->execute([$game_id]);
 }
